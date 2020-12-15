@@ -1,25 +1,32 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+} from 'react-router-dom';
+
+import './App.scss';
+import ArtistView from './ArtistView';
+import HomeView from './HomeView';
+import Layout from "./Layout/Layout";
+
+// TODO Children type
+// TODO Sidebar width / styled components?
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Layout>
+        <Switch>
+          <Route path={'/artist'}>
+            <ArtistView/>
+          </Route>
+          <Route path={'/'}>
+            <HomeView/>
+          </Route>
+        </Switch>
+      </Layout>
+    </Router>
   );
 }
 
