@@ -4,28 +4,39 @@ import {
   Switch,
   Route,
 } from 'react-router-dom';
+import { ApolloProvider } from '@apollo/client';
 
-import './App.scss';
 import ArtistView from './ArtistView';
 import HomeView from './HomeView';
 import Layout from "./Layout/Layout";
 
+import './App.scss';
+
 // TODO Children type
 // TODO Sidebar width / styled components?
+
+import { ApolloClient, InMemoryCache } from '@apollo/client';
+
+const client: ApolloClient<unknown> = new ApolloClient({
+  uri: 'https://graphbrainz.herokuapp.com',
+  cache: new InMemoryCache()
+});
 
 function App() {
   return (
     <Router>
-      <Layout>
-        <Switch>
-          <Route path={'/artist'}>
-            <ArtistView/>
-          </Route>
-          <Route path={'/'}>
-            <HomeView/>
-          </Route>
-        </Switch>
-      </Layout>
+      <ApolloProvider client={client}>
+        <Layout>
+          <Switch>
+            <Route path={'/artist'}>
+              <ArtistView/>
+            </Route>
+            <Route path={'/'}>
+              <HomeView/>
+            </Route>
+          </Switch>
+        </Layout>
+      </ApolloProvider>
     </Router>
   );
 }
