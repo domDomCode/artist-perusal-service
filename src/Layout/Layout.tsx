@@ -38,9 +38,9 @@ const Layout: FC<any> = (props) => {
         <Divider/>
         <div style={{width: '250px'}}>TEST TEST TEST TEST TEST TEST TEST</div>
       </Drawer>
-      <Container style={{marginTop: '64px', paddingTop: '100px'}}>
+      <div style={{margin: '64px auto 0', paddingTop: '100px', width: '700px'}}>
         {props.children}
-      </Container>
+      </div>
     </div>
   )
 }

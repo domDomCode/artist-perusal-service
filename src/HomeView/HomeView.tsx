@@ -1,9 +1,21 @@
 import React, { ChangeEvent, FC, useState } from 'react';
-import { useQuery, gql } from '@apollo/client';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@material-ui/core';
+import { gql, useLazyQuery } from '@apollo/client';
+import { useDebouncedCallback } from "use-debounce";
+import { FavoriteBorder, ZoomIn } from "@material-ui/icons";
+import {
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField
+} from '@material-ui/core';
+
 
 import './HomeView.scss'
-import { useDebounce } from "use-debounce";
+import { Link } from "react-router-dom";
 
 interface artistSearchResponse {
   search: {
@@ -15,6 +27,7 @@ interface artistSearchResponse {
 
 interface Artist {
   name: string
+  id: number
 }
 
 const GET_ARTISTS = gql`
@@ -32,16 +45,19 @@ query GetArtists($name: String!) {
 
 const HomeView: FC = () => {
   const [ searchValue, setSearchValue ] = useState('');
-  const [ debouncedValue ] = useDebounce(searchValue, 2000)
+  const [ getArtists, {loading, error, data}] = useLazyQuery<artistSearchResponse>(GET_ARTISTS);
 
-  const {loading, error, data} = useQuery<artistSearchResponse>(
-    GET_ARTISTS, {variables: {name: debouncedValue}}
-  );
+  const getArtistsDebounced = useDebouncedCallback(getArtists, 500);
+
+  let artistsList: Artist[] | null; //TODO fixme, make data more readable
+
+  // useEffect(() => artistsList = data?.search.artists.nodes, [data])
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
 
     setSearchValue(value);
+    getArtistsDebounced.callback({variables: {name: searchValue}});
   }
 
   return (
@@ -55,20 +71,34 @@ const HomeView: FC = () => {
         />
       </div>
       <div>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Artist name</TableCell>
-                <TableCell>Dunno yet</TableCell>
-                <TableCell>Add to favorites</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {loading && <CircularProgress color={'secondary'}/>}
+        {error && 'Something went wrong! Try searching again, or reloading the page'}
+        {data
+          ? (
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Artist name</TableCell>
+                    <TableCell>Dunno yet</TableCell>
+                    <TableCell>See more</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {data.search.artists.nodes.map((artist: Artist) => (
+                    <TableRow key={artist.id}>
+                      <TableCell>{artist.name}</TableCell>
+                      <TableCell>{artist.name}</TableCell>
+                      <TableCell><Link to={'/artist'}><ZoomIn/></Link></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )
+          : (
+            <div>Try typing in a search above to look up artists!</div>
+          )}
       </div>
     </div>
   )
