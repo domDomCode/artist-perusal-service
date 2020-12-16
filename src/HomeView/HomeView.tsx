@@ -1,41 +1,14 @@
-import React, { ChangeEvent, FC, useEffect, useState } from 'react';
-import { gql, useLazyQuery } from '@apollo/client';
+import React, { ChangeEvent, FC, useEffect } from 'react';
+import { useLazyQuery } from '@apollo/client';
 import { useDebouncedCallback } from "use-debounce";
 import { ZoomIn } from "@material-ui/icons";
-import {
-  CircularProgress, Divider, List, ListItem, ListSubheader,
-  TextField, Typography
-} from '@material-ui/core';
+import { Link } from "react-router-dom";
+import { CircularProgress, Divider, List, ListItem, ListSubheader, TextField, Typography } from '@material-ui/core';
 
+import { ArtistInterface, ArtistsSearchResponseInterface } from "../types/interfaces";
+import { GET_ARTISTS } from "./query";
 
 import './HomeView.scss'
-import { Link } from "react-router-dom";
-
-interface ArtistsSearchResponseInterface {
-  search: {
-    artists: {
-      nodes: ArtistInterface[]
-    }
-  }
-}
-
-interface ArtistInterface {
-  name: string
-  mbid: string
-}
-
-const GET_ARTISTS = gql`
-query GetArtists($name: String!) {
-  search {
-    artists(query: $name) {
-      nodes {
-        mbid
-        name
-      }
-    }
-  }
-}
-`;
 
 interface Props {
   searchValue: string;
@@ -68,7 +41,7 @@ const HomeView: FC<Props> = ({searchValue, setSearchValue}) => {
     <Typography variant={'body1'}>
       Could not find any artists :((
     </Typography>
-  )
+  );
 
   return (
     <div style={{width: '100%'}} className={'HomeView'}>

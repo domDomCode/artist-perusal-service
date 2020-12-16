@@ -2,83 +2,33 @@ import React, { FC, useContext } from 'react';
 import {
   Button,
   Card,
-  CardActions,
   CardContent,
   CardHeader,
-  CircularProgress, Divider,
+  CircularProgress,
+  Divider,
   IconButton,
-  List, ListItem,
-  ListSubheader, Typography
+  List,
+  ListItem,
+  ListSubheader,
+  Typography
 } from '@material-ui/core';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import { Link, useParams } from 'react-router-dom';
-import { gql, useQuery } from "@apollo/client";
-import { ToastContainer, toast } from 'react-toastify';
+import { useQuery } from "@apollo/client";
+import { toast } from 'react-toastify';
 import { v4 as uuid } from 'uuid';
 
-import StoreContext, {} from "../StoreContext/index";
-import { StoreInterface } from '../StoreContext/StoreContext' //FIXME not working from index
-import { FavoriteArtistInterface } from "../FavoriteList/index";
+import StoreContext, { StoreInterface } from "../StoreContext/index";
+import { FavoriteArtistInterface, ArtistLookupResponseInterface, ReleaseInterface } from "../types/interfaces";
+import { GET_ARTIST_DETAIL } from "./query";
 
 import 'react-toastify/dist/ReactToastify.css';
 import './ArtistView.scss';
-
-interface ArtistLookupResponseInterface {
-  lookup: {
-    artist: ArtistDetailInterface
-  }
-}
-
-interface ArtistDetailInterface {
-  name: string;
-  country: string;
-  type: string;
-  rating: {
-    value: string;
-  }
-  releaseGroups: ReleaseGroupsInterface
-  mbid: string
-}
-
-interface ReleaseGroupsInterface {
-  edges: ReleaseInterface[]
-}
-
-interface ReleaseInterface {
-  node: {
-    title: string;
-    firstReleaseDate: string;
-  }
-}
 
 enum ActionTypeEnum {
   REMOVE = 'removed',
   ADD = 'added'
 }
-
-const GET_ARTIST_DETAIL = gql`
-query GetArtistDetail($mbid: MBID!) {
-  lookup {
-    artist(mbid: $mbid) {
-      name
-      country
-      type
-      mbid
-      rating {
-        value
-      }
-      releaseGroups(type: ALBUM) {
-        edges {
-          node {
-            title
-            firstReleaseDate
-          }
-        }
-      }
-    }
-  }
-}
-`;
 
 interface ParamTypes {
   mbid: string
@@ -88,7 +38,10 @@ const ArtistView: FC = () => {
   // Initialization, data fetch
   const {mbid} = useParams<ParamTypes>();
 
-  const {data, loading, error} = useQuery<ArtistLookupResponseInterface>(GET_ARTIST_DETAIL, {variables: {mbid: mbid}})
+  const {data, loading, error} = useQuery<ArtistLookupResponseInterface>(
+    GET_ARTIST_DETAIL,
+    {variables: {mbid: mbid}}
+  );
   // ------------------
 
   // Favorite artist
@@ -124,7 +77,7 @@ const ArtistView: FC = () => {
   const favoriteChangeToast = (actionType: ActionTypeEnum) => toast(`
     ${data?.lookup.artist.name} has been ${actionType} 
     ${actionType === ActionTypeEnum.ADD ? 'to' : 'from'} your favorite list
-  `)
+  `);
   // ------------------
 
   // Component modes
@@ -132,13 +85,13 @@ const ArtistView: FC = () => {
     <CardContent classes={{root: 'ArtistView__loading-container'}}>
       <CircularProgress color={'secondary'}/>
     </CardContent>
-  )
+  );
 
   const errorMode = (
     <CardContent>
       Something went wrong!
     </CardContent>
-  )
+  );
   // ------------------
 
   return (
@@ -147,7 +100,7 @@ const ArtistView: FC = () => {
       {error && errorMode}
       {data && (
         <>
-          <CardHeader title={data.lookup.artist.name}/>
+          <CardHeader classes={{root: 'ArtistView__header'}} title={data.lookup.artist.name}/>
           <CardContent>
             <Button className={'ArtistView__back-btn'} variant={'contained'} color={'primary'}>
               <Link to={'/'}>Go back</Link>

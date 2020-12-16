@@ -3,6 +3,10 @@
 .ArtistView {
   position: relative;
 
+  &__header {
+    width: 50%;
+  }
+
   &__loading-container {
     display: flex;
     justify-content: center;

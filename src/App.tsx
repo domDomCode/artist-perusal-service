@@ -10,13 +10,10 @@ import { ToastContainer } from "react-toastify";
 import ArtistView from './ArtistView/index';
 import HomeView from './HomeView/index';
 import Layout from "./Layout/index";
-import StoreContext from "./StoreContext/index";
+import StoreContext, { StoreInterface } from "./StoreContext/index";
 
 import './App.scss';
 import 'fontsource-roboto';
-
-// TODO Children type
-// TODO Sidebar width / styled components?
 
 const client: ApolloClient<unknown> = new ApolloClient({
   uri: 'https://graphbrainz.herokuapp.com',
@@ -24,11 +21,12 @@ const client: ApolloClient<unknown> = new ApolloClient({
 });
 
 function App() {
-  //TODO replace default with localStorage
-  const [favoriteList, setFavoriteList ] = useState([]);
+  const [favoriteList, setFavoriteList ] = useState(
+    JSON.parse(localStorage.getItem('favoriteList') || '[]')
+  );
   const [searchValue, setSearchValue] = useState('');
 
-  const store = {
+  const store: StoreInterface = {
     favoriteList: {get: favoriteList, set: setFavoriteList}
   }
 
