@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC, useState } from 'react';
+import React, { ChangeEvent, FC, useEffect, useState } from 'react';
 import { gql, useLazyQuery } from '@apollo/client';
 import { useDebouncedCallback } from "use-debounce";
 import { ZoomIn } from "@material-ui/icons";
@@ -37,21 +37,23 @@ query GetArtists($name: String!) {
 }
 `;
 
-const HomeView: FC = () => {
-  const [ searchValue, setSearchValue ] = useState('');
-  const [ getArtists, {loading, error, data}] = useLazyQuery<ArtistsSearchResponseInterface>(GET_ARTISTS);
+interface Props {
+  searchValue: string;
+  setSearchValue(value: string): void;
+}
+
+const HomeView: FC<Props> = ({searchValue, setSearchValue}) => {
+  const [ getArtists, {loading, error, data} ] = useLazyQuery<ArtistsSearchResponseInterface>(GET_ARTISTS);
 
   const getArtistsDebounced = useDebouncedCallback(getArtists, 500);
 
-  let artistsList: ArtistInterface[] | null; //TODO fixme, make data more readable
-
-  // useEffect(() => artistsList = data?.search.artists.nodes, [data])
+  useEffect(() => {
+    searchValue && getArtistsDebounced.callback({variables: {name: searchValue}})
+  }, [getArtistsDebounced, searchValue])
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
-
     setSearchValue(value);
-    getArtistsDebounced.callback({variables: {name: searchValue}});
   }
 
   return (
@@ -68,7 +70,7 @@ const HomeView: FC = () => {
         {loading && <CircularProgress color={'secondary'}/>}
         {error &&
         <Typography variant={'body1'}>
-          Something went wrong! Try searching again, or reloading the page
+            Something went wrong! Try searching again, or reloading the page
         </Typography>}
         {data &&
         <List

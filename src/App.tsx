@@ -5,6 +5,7 @@ import {
   Route,
 } from 'react-router-dom';
 import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
+import { ToastContainer } from "react-toastify";
 
 import ArtistView from './ArtistView/index';
 import HomeView from './HomeView/index';
@@ -24,7 +25,8 @@ const client: ApolloClient<unknown> = new ApolloClient({
 
 function App() {
   //TODO replace default with localStorage
-  const [favoriteList, setFavoriteList ] = useState([])
+  const [favoriteList, setFavoriteList ] = useState([]);
+  const [searchValue, setSearchValue] = useState('');
 
   const store = {
     favoriteList: {get: favoriteList, set: setFavoriteList}
@@ -37,12 +39,13 @@ function App() {
           <Layout>
             <Switch>
               <Route path={'/artist/:mbid?'}>
-                  <ArtistView/>
+                <ArtistView/>
               </Route>
               <Route path={'/'}>
-                <HomeView/>
+                <HomeView searchValue={searchValue} setSearchValue={setSearchValue}/>
               </Route>
             </Switch>
+            <ToastContainer />
           </Layout>
         </StoreContext.Provider>
       </ApolloProvider>

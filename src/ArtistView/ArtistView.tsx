@@ -8,7 +8,7 @@ import {
   CircularProgress, Divider,
   IconButton,
   List, ListItem,
-  ListSubheader
+  ListSubheader, Typography
 } from '@material-ui/core';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import { Link, useParams } from 'react-router-dom';
@@ -35,7 +35,6 @@ interface ArtistDetailInterface {
   type: string;
   rating: {
     value: string;
-    voteCount: number;
   }
   releaseGroups: ReleaseGroupsInterface
   mbid: string
@@ -67,7 +66,6 @@ query GetArtistDetail($mbid: MBID!) {
       mbid
       rating {
         value
-        voteCount
       }
       releaseGroups(type: ALBUM) {
         edges {
@@ -131,7 +129,7 @@ const ArtistView: FC = () => {
 
   // Component modes
   const loadingMode = (
-    <CardContent>
+    <CardContent classes={{root: 'ArtistView__loading-container'}}>
       <CircularProgress color={'secondary'}/>
     </CardContent>
   )
@@ -154,11 +152,37 @@ const ArtistView: FC = () => {
             <Button className={'ArtistView__back-btn'} variant={'contained'} color={'primary'}>
               <Link to={'/'}>Go back</Link>
             </Button>
-            <div>{data.lookup.artist.country}</div>
-            <div>{data.lookup.artist.type}</div>
+            <IconButton
+              className={'ArtistView__favorite-btn'}
+              color={isFavorite ? 'secondary' : 'default'}
+              aria-label="add to favorites"
+              onClick={() => addRemoveFavorite()}
+            >
+              <FavoriteIcon/>
+            </IconButton>
             <div>
-              <span>{data.lookup.artist.rating.value}</span>
-              <span>{data.lookup.artist.rating.voteCount}</span>
+              <Typography variant={"body1"} display={'inline'}>
+                Country:{'  '}
+              </Typography>
+              <Typography variant={"body1"} display={'inline'}>
+                {data.lookup.artist.country}
+              </Typography>
+            </div>
+            <div>
+              <Typography variant={"body1"} display={'inline'}>
+                Type:{'  '}
+              </Typography>
+              <Typography variant={"body1"} display={'inline'}>
+                {data.lookup.artist.type}
+              </Typography>
+            </div>
+            <div>
+              <Typography variant={"body1"} display={'inline'}>
+                Rating:{'  '}
+              </Typography>
+              <Typography variant={"body1"} display={'inline'}>
+                {data.lookup.artist.rating.value}
+              </Typography>
             </div>
             {data.lookup.artist.releaseGroups.edges &&
             <List
@@ -172,27 +196,21 @@ const ArtistView: FC = () => {
                 return(
                   <React.Fragment key={uuid()}>
                     {index !== 0 ? <Divider/> : null}
-                    <ListItem>
-                      <span>{release.node.title}</span>
-                      <span>{release.node.firstReleaseDate}</span>
+                    <ListItem classes={{root: 'ArtistView__release-item'}}>
+                      <Typography variant={"body1"} display={'inline'}>
+                        {release.node.title}
+                      </Typography>
+                      <Typography variant={"body1"} display={'inline'}>
+                        {release.node.firstReleaseDate}
+                      </Typography>
                     </ListItem>
                   </React.Fragment>
                 )
               })}
             </List>}
           </CardContent>
-          <CardActions>
-            <IconButton
-              color={isFavorite ? 'secondary' : 'default'}
-              aria-label="add to favorites"
-              onClick={() => addRemoveFavorite()}
-            >
-              <FavoriteIcon/>
-            </IconButton>
-          </CardActions>
         </>
       )}
-      <ToastContainer />
     </Card>
   )
 }
