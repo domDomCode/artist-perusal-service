@@ -3,11 +3,13 @@ import { Card, CardActions, CardContent, CardHeader, CircularProgress, IconButto
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import { useParams } from 'react-router-dom';
 import { gql, useQuery } from "@apollo/client";
+import { ToastContainer, toast } from 'react-toastify';
 
 import StoreContext, {} from "../StoreContext/index";
 import { StoreInterface } from '../StoreContext/StoreContext' //FIXME not working from index
-
 import { FavoriteArtistInterface } from "../FavoriteList/index";
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface ArtistLookupResponseInterface {
   lookup: {
@@ -32,6 +34,11 @@ interface ArtistReleaseGroupsInterface {
     title: string;
     firstReleaseDate: string;
   }
+}
+
+enum ActionTypeEnum {
+  REMOVE = 'removed',
+  ADD = 'added'
 }
 
 const GET_ARTIST_DETAIL = gql`
@@ -64,17 +71,23 @@ interface ParamTypes {
 }
 
 const ArtistView: FC = (props) => {
+  // Initialization, data fetch
   const {mbid} = useParams<ParamTypes>();
 
   const {data, loading, error} = useQuery<ArtistLookupResponseInterface>(GET_ARTIST_DETAIL, {variables: {mbid: mbid}})
+  // ------------------
 
+  // Favorite artist
   const store = useContext<StoreInterface>(StoreContext);
   const {favoriteList} = store;
+
+  const isFavorite = favoriteList?.get.find((artist: FavoriteArtistInterface) => artist.mbid === mbid);
 
   const removeFavoriteArtist = () => {
     const {favoriteList} = store;
 
-    favoriteList?.set(favoriteList.get.filter((favorite: FavoriteArtistInterface) => favorite.mbid !== mbid))
+    favoriteList?.set(favoriteList.get.filter((favorite: FavoriteArtistInterface) => favorite.mbid !== mbid));
+    favoriteChangeToast(ActionTypeEnum.REMOVE);
   }
 
   const addFavoriteArtist = () => {
@@ -86,15 +99,21 @@ const ArtistView: FC = (props) => {
     favoriteList && favoriteList.set([
       ...favoriteList.get,
       newFavoriteArtist
-    ])
+    ]);
+    favoriteChangeToast(ActionTypeEnum.ADD);
   }
-
-  const isFavorite = favoriteList?.get.find((artist: FavoriteArtistInterface) => artist.mbid === mbid);
 
   const addRemoveFavorite = () => {
     isFavorite ? removeFavoriteArtist() : addFavoriteArtist();
   }
 
+  const favoriteChangeToast = (actionType: ActionTypeEnum) => toast(`
+    ${data?.lookup.artist.name} has been ${actionType} 
+    ${actionType === ActionTypeEnum.ADD ? 'to' : 'from'} your favorite list
+  `)
+  // ------------------
+
+  // Component modes
   const loadingMode = (
     <CardContent>
       <CircularProgress color={'secondary'}/>
@@ -106,6 +125,7 @@ const ArtistView: FC = (props) => {
       Something went wrong!
     </CardContent>
   )
+  // ------------------
 
   return (
     <Card>
@@ -133,6 +153,7 @@ const ArtistView: FC = (props) => {
           </CardActions>
         </>
       )}
+      <ToastContainer />
     </Card>
   )
 }
