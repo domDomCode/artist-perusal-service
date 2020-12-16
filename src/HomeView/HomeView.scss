@@ -1,3 +1,35 @@
-.HomeView {
+@import "../scss/variables";
 
+.HomeView {
+  &__search {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 50px;
+  }
+
+  &__list-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__list-item {
+    & > p {
+      margin-right: 20px;
+    }
+  }
+
+  &__see-artist-link {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    transition: .2s ease;
+    width: fit-content;
+    padding: 5px;
+
+    &:hover {
+      color: $secondary;
+    }
+  }
 }

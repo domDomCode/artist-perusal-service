@@ -3,14 +3,8 @@ import { gql, useLazyQuery } from '@apollo/client';
 import { useDebouncedCallback } from "use-debounce";
 import { ZoomIn } from "@material-ui/icons";
 import {
-  CircularProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField
+  CircularProgress, Divider, List, ListItem, ListSubheader,
+  TextField, Typography
 } from '@material-ui/core';
 
 
@@ -20,12 +14,12 @@ import { Link } from "react-router-dom";
 interface ArtistsSearchResponseInterface {
   search: {
     artists: {
-      nodes: Artist[]
+      nodes: ArtistInterface[]
     }
   }
 }
 
-interface Artist {
+interface ArtistInterface {
   name: string
   mbid: string
 }
@@ -49,7 +43,7 @@ const HomeView: FC = () => {
 
   const getArtistsDebounced = useDebouncedCallback(getArtists, 500);
 
-  let artistsList: Artist[] | null; //TODO fixme, make data more readable
+  let artistsList: ArtistInterface[] | null; //TODO fixme, make data more readable
 
   // useEffect(() => artistsList = data?.search.artists.nodes, [data])
 
@@ -62,7 +56,7 @@ const HomeView: FC = () => {
 
   return (
     <div style={{width: '100%'}} className={'HomeView'}>
-      <div>
+      <div className={'HomeView__search'}>
         <TextField
           label={'Search artists'}
           variant={'outlined'}
@@ -70,35 +64,32 @@ const HomeView: FC = () => {
           onChange={handleSearchChange}
         />
       </div>
-      <div>
+      <div className={'HomeView__list-container'}>
         {loading && <CircularProgress color={'secondary'}/>}
-        {error && 'Something went wrong! Try searching again, or reloading the page'}
-        {data
-          ? (
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Artist name</TableCell>
-                    <TableCell>Dunno yet</TableCell>
-                    <TableCell>See more</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data.search.artists.nodes.map((artist: Artist) => (
-                    <TableRow key={artist.mbid}>
-                      <TableCell>{artist.name}</TableCell>
-                      <TableCell>{artist.name}</TableCell>
-                      <TableCell><Link to={`/artist/${artist.mbid}`}><ZoomIn/></Link></TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )
-          : (
-            <div>Try typing in a search above to look up artists!</div>
-          )}
+        {error &&
+        <Typography variant={'body1'}>
+          Something went wrong! Try searching again, or reloading the page
+        </Typography>}
+        {data &&
+        <List
+            subheader={
+              <ListSubheader>
+                Artists
+              </ListSubheader>
+            }
+        >
+          {data.search.artists.nodes.map((artist: ArtistInterface) => (
+            <React.Fragment key={artist.mbid}>
+              <ListItem classes={{root: 'HomeView__list-item'}}>
+                <Typography>
+                  <Link className={'HomeView__see-artist-link'} to={`/artist/${artist.mbid}`}><ZoomIn/></Link>
+                </Typography>
+                <Typography variant={"body1"}>{artist.name}</Typography>
+              </ListItem>
+              <Divider/>
+            </React.Fragment>
+          ))}
+        </List>}
       </div>
     </div>
   )

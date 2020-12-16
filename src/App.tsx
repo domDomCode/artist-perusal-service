@@ -12,6 +12,7 @@ import Layout from "./Layout/index";
 import StoreContext from "./StoreContext/index";
 
 import './App.scss';
+import 'fontsource-roboto';
 
 // TODO Children type
 // TODO Sidebar width / styled components?
