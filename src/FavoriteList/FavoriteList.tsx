@@ -13,7 +13,6 @@ const FavoriteList = () => {
 
 
   const favoriteList: FavoriteArtistInterface[] | [] = store.favoriteList ? store.favoriteList.get : [];
-  console.log('favoriteList', favoriteList);
 
   return (
     <>

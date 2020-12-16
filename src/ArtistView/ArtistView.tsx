@@ -1,9 +1,19 @@
 import React, { FC, useContext } from 'react';
-import { Card, CardActions, CardContent, CardHeader, CircularProgress, IconButton } from '@material-ui/core';
+import {
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  CircularProgress, Divider,
+  IconButton,
+  List, ListItem,
+  ListSubheader
+} from '@material-ui/core';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import { useParams } from 'react-router-dom';
 import { gql, useQuery } from "@apollo/client";
 import { ToastContainer, toast } from 'react-toastify';
+import { v4 as uuid } from 'uuid';
 
 import StoreContext, {} from "../StoreContext/index";
 import { StoreInterface } from '../StoreContext/StoreContext' //FIXME not working from index
@@ -25,12 +35,16 @@ interface ArtistDetailInterface {
     value: string;
     voteCount: number;
   }
-  releaseGroups: ArtistReleaseGroupsInterface[]
+  releaseGroups: ReleaseGroupsInterface
   mbid: string
 }
 
-interface ArtistReleaseGroupsInterface {
-  nodes: {
+interface ReleaseGroupsInterface {
+  edges: ReleaseInterface[]
+}
+
+interface ReleaseInterface {
+  node: {
     title: string;
     firstReleaseDate: string;
   }
@@ -141,6 +155,26 @@ const ArtistView: FC = (props) => {
               <span>{data.lookup.artist.rating.value}</span>
               <span>{data.lookup.artist.rating.voteCount}</span>
             </div>
+            {data.lookup.artist.releaseGroups.edges &&
+            <List
+              subheader={
+                <ListSubheader>
+                  Releases
+                </ListSubheader>
+              }
+            >
+              {data.lookup.artist.releaseGroups.edges.map((release: ReleaseInterface) => {
+                return(
+                  <React.Fragment key={uuid()}>
+                    <ListItem>
+                      <span>{release.node.title}</span>
+                      <span>{release.node.firstReleaseDate}</span>
+                    </ListItem>
+                    <Divider/>
+                  </React.Fragment>
+                )
+              })}
+            </List>}
           </CardContent>
           <CardActions>
             <IconButton
