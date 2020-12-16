@@ -1,8 +1,9 @@
 import React, { FC, useState } from 'react';
 import { Link } from "react-router-dom";
-import { AppBar, Container, Divider, Drawer, IconButton, Toolbar } from "@material-ui/core";
+import { AppBar, Divider, Drawer, IconButton, Toolbar } from "@material-ui/core";
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import FavoriteList from "../FavoriteList/FavoriteList";
 
 const Layout: FC<any> = (props) => {
   const [ isSidebarOpen, setIsSidebarOpen ] = useState(false);
@@ -36,7 +37,7 @@ const Layout: FC<any> = (props) => {
           </IconButton>
         </div>
         <Divider/>
-        <div style={{width: '250px'}}>TEST TEST TEST TEST TEST TEST TEST</div>
+        <FavoriteList/>
       </Drawer>
       <div style={{margin: '64px auto 0', paddingTop: '100px', width: '700px'}}>
         {props.children}

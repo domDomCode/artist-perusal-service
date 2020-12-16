@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FC, useState } from 'react';
 import { gql, useLazyQuery } from '@apollo/client';
 import { useDebouncedCallback } from "use-debounce";
-import { FavoriteBorder, ZoomIn } from "@material-ui/icons";
+import { ZoomIn } from "@material-ui/icons";
 import {
   CircularProgress,
   Table,
@@ -17,7 +17,7 @@ import {
 import './HomeView.scss'
 import { Link } from "react-router-dom";
 
-interface artistSearchResponse {
+interface ArtistsSearchResponseInterface {
   search: {
     artists: {
       nodes: Artist[]
@@ -27,7 +27,7 @@ interface artistSearchResponse {
 
 interface Artist {
   name: string
-  id: number
+  mbid: string
 }
 
 const GET_ARTISTS = gql`
@@ -35,7 +35,7 @@ query GetArtists($name: String!) {
   search {
     artists(query: $name) {
       nodes {
-        id
+        mbid
         name
       }
     }
@@ -45,7 +45,7 @@ query GetArtists($name: String!) {
 
 const HomeView: FC = () => {
   const [ searchValue, setSearchValue ] = useState('');
-  const [ getArtists, {loading, error, data}] = useLazyQuery<artistSearchResponse>(GET_ARTISTS);
+  const [ getArtists, {loading, error, data}] = useLazyQuery<ArtistsSearchResponseInterface>(GET_ARTISTS);
 
   const getArtistsDebounced = useDebouncedCallback(getArtists, 500);
 
@@ -86,10 +86,10 @@ const HomeView: FC = () => {
                 </TableHead>
                 <TableBody>
                   {data.search.artists.nodes.map((artist: Artist) => (
-                    <TableRow key={artist.id}>
+                    <TableRow key={artist.mbid}>
                       <TableCell>{artist.name}</TableCell>
                       <TableCell>{artist.name}</TableCell>
-                      <TableCell><Link to={'/artist'}><ZoomIn/></Link></TableCell>
+                      <TableCell><Link to={`/artist/${artist.mbid}`}><ZoomIn/></Link></TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

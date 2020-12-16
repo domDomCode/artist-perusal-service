@@ -28,7 +28,7 @@ function App() {
       <ApolloProvider client={client}>
         <Layout>
           <Switch>
-            <Route path={'/artist'}>
+            <Route path={'/artist/:mbid?'}>
               <ArtistView/>
             </Route>
             <Route path={'/'}>
