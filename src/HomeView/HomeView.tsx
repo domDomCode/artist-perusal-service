@@ -56,6 +56,20 @@ const HomeView: FC<Props> = ({searchValue, setSearchValue}) => {
     setSearchValue(value);
   }
 
+  const loadingMode = <CircularProgress color={'secondary'}/>;
+
+  const errorMode = (
+    <Typography variant={'body1'}>
+      Something went wrong! Try searching again, or reloading the page
+    </Typography>
+  );
+
+  const noResultsMode = (
+    <Typography variant={'body1'}>
+      Could not find any artists :((
+    </Typography>
+  )
+
   return (
     <div style={{width: '100%'}} className={'HomeView'}>
       <div className={'HomeView__search'}>
@@ -67,11 +81,8 @@ const HomeView: FC<Props> = ({searchValue, setSearchValue}) => {
         />
       </div>
       <div className={'HomeView__list-container'}>
-        {loading && <CircularProgress color={'secondary'}/>}
-        {error &&
-        <Typography variant={'body1'}>
-            Something went wrong! Try searching again, or reloading the page
-        </Typography>}
+        {loading && loadingMode}
+        {error && errorMode}
         {data &&
         <List
             subheader={
@@ -80,17 +91,19 @@ const HomeView: FC<Props> = ({searchValue, setSearchValue}) => {
               </ListSubheader>
             }
         >
-          {data.search.artists.nodes.map((artist: ArtistInterface) => (
-            <React.Fragment key={artist.mbid}>
-              <ListItem classes={{root: 'HomeView__list-item'}}>
-                <Typography>
-                  <Link className={'HomeView__see-artist-link'} to={`/artist/${artist.mbid}`}><ZoomIn/></Link>
-                </Typography>
-                <Typography variant={"body1"}>{artist.name}</Typography>
-              </ListItem>
-              <Divider/>
-            </React.Fragment>
-          ))}
+          {data.search.artists.nodes.length
+            ? data.search.artists.nodes.map((artist: ArtistInterface) => (
+              <React.Fragment key={artist.mbid}>
+                <ListItem classes={{root: 'HomeView__list-item'}}>
+                  <Typography>
+                    <Link className={'HomeView__see-artist-link'} to={`/artist/${artist.mbid}`}><ZoomIn/></Link>
+                  </Typography>
+                  <Typography variant={"body1"}>{artist.name}</Typography>
+                </ListItem>
+                <Divider/>
+              </React.Fragment>
+            ))
+            : noResultsMode}
         </List>}
       </div>
     </div>
