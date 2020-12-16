@@ -1,0 +1,15 @@
+@import 'src/scss/variables';
+
+.ArtistView {
+  position: relative;
+
+  &__back-btn {
+    position: absolute !important; // material override
+    top: 16px;
+    right: 16px;
+
+    a {
+      color: $white;
+    }
+  }
+}

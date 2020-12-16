@@ -1,5 +1,6 @@
 import React, { FC, useContext } from 'react';
 import {
+  Button,
   Card,
   CardActions,
   CardContent,
@@ -10,7 +11,7 @@ import {
   ListSubheader
 } from '@material-ui/core';
 import FavoriteIcon from '@material-ui/icons/Favorite';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { gql, useQuery } from "@apollo/client";
 import { ToastContainer, toast } from 'react-toastify';
 import { v4 as uuid } from 'uuid';
@@ -20,6 +21,7 @@ import { StoreInterface } from '../StoreContext/StoreContext' //FIXME not workin
 import { FavoriteArtistInterface } from "../FavoriteList/index";
 
 import 'react-toastify/dist/ReactToastify.css';
+import './ArtistView.scss';
 
 interface ArtistLookupResponseInterface {
   lookup: {
@@ -84,7 +86,7 @@ interface ParamTypes {
   mbid: string
 }
 
-const ArtistView: FC = (props) => {
+const ArtistView: FC = () => {
   // Initialization, data fetch
   const {mbid} = useParams<ParamTypes>();
 
@@ -142,13 +144,16 @@ const ArtistView: FC = (props) => {
   // ------------------
 
   return (
-    <Card>
+    <Card classes={{root: 'ArtistView'}}>
       {loading && loadingMode}
       {error && errorMode}
       {data && (
         <>
           <CardHeader title={data.lookup.artist.name}/>
           <CardContent>
+            <Button className={'ArtistView__back-btn'} variant={'contained'} color={'primary'}>
+              <Link to={'/'}>Go back</Link>
+            </Button>
             <div>{data.lookup.artist.country}</div>
             <div>{data.lookup.artist.type}</div>
             <div>
@@ -163,14 +168,14 @@ const ArtistView: FC = (props) => {
                 </ListSubheader>
               }
             >
-              {data.lookup.artist.releaseGroups.edges.map((release: ReleaseInterface) => {
+              {data.lookup.artist.releaseGroups.edges.map((release: ReleaseInterface, index) => {
                 return(
                   <React.Fragment key={uuid()}>
+                    {index !== 0 ? <Divider/> : null}
                     <ListItem>
                       <span>{release.node.title}</span>
                       <span>{release.node.firstReleaseDate}</span>
                     </ListItem>
-                    <Divider/>
                   </React.Fragment>
                 )
               })}

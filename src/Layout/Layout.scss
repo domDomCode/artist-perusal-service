@@ -1,0 +1,28 @@
+.Layout {
+  width: 100%;
+
+  &__drawer {
+    width: 200px;
+  }
+
+  &__close-btn {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  &__title {
+    margin-left: 50px;
+  }
+
+  &__main {
+    margin: 64px auto 0;
+
+    padding-top: 100px;
+    width: 100%;
+
+    @media (min-width: 768px) { // wow much responsive
+      width: 400px;
+    }
+  }
+}

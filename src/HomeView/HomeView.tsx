@@ -73,7 +73,7 @@ const HomeView: FC = () => {
         {data &&
         <List
             subheader={
-              <ListSubheader>
+              <ListSubheader classes={{root: 'HomeView__list-subheader'}}>
                 Artists
               </ListSubheader>
             }

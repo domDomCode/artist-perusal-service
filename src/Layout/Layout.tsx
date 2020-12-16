@@ -1,15 +1,18 @@
 import React, { FC, useState } from 'react';
-import { Link } from "react-router-dom";
-import { AppBar, Divider, Drawer, IconButton, Toolbar } from "@material-ui/core";
+import { AppBar, Divider, Drawer, IconButton, Toolbar, Typography } from "@material-ui/core";
 import MenuIcon from '@material-ui/icons/Menu';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+
 import FavoriteList from "../FavoriteList/FavoriteList";
 
+import './Layout.scss';
+
+/** Dumb component, common for the whole app. Renders different routes as children */
 const Layout: FC<any> = (props) => {
   const [ isSidebarOpen, setIsSidebarOpen ] = useState(false);
 
   return (
-    <div style={{width: '100%'}}>
+    <div className={'Layout'}>
       <AppBar position={'fixed'} className={'Header'}>
         <Toolbar>
           <IconButton
@@ -20,26 +23,30 @@ const Layout: FC<any> = (props) => {
           >
             <MenuIcon/>
           </IconButton>
-
-          <Link to={'/'}>Home</Link>
-          <span>ARTIST PERUSAL SERVICE</span>
+          <div className={'Layout__title'}>
+            <Typography variant={'h4'} component={'h1'}>
+              ARTIST PERUSAL SERVICE
+            </Typography>
+          </div>
         </Toolbar>
       </AppBar>
-      {/* eslint-disable-next-line react/jsx-no-undef */}
       <Drawer
         variant="persistent"
         anchor="left"
         open={isSidebarOpen}
+        classes={{paper: 'Layout__drawer'}}
       >
-        <div>
-          <IconButton onClick={() => setIsSidebarOpen(prevState => !prevState)}>
-            <ChevronRightIcon/>
+        <div className={'Layout__close-btn'}>
+          <IconButton
+            onClick={() => setIsSidebarOpen(prevState => !prevState)}
+          >
+            <ChevronLeftIcon/>
           </IconButton>
         </div>
         <Divider/>
         <FavoriteList/>
       </Drawer>
-      <div style={{margin: '64px auto 0', paddingTop: '100px', width: '700px'}}>
+      <div className={'Layout__main'}>
         {props.children}
       </div>
     </div>
