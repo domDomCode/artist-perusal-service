@@ -1,8 +1,13 @@
-import React, { FC } from 'react';
+import React, { FC, useContext } from 'react';
 import { Card, CardActions, CardContent, CardHeader, CircularProgress, IconButton } from '@material-ui/core';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import { useParams } from 'react-router-dom';
 import { gql, useQuery } from "@apollo/client";
+
+import StoreContext, {} from "../StoreContext/index";
+import { StoreInterface } from '../StoreContext/StoreContext' //FIXME not working from index
+
+import { FavoriteArtistInterface } from "../FavoriteList/index";
 
 interface ArtistLookupResponseInterface {
   lookup: {
@@ -19,7 +24,7 @@ interface ArtistDetailInterface {
     voteCount: number;
   }
   releaseGroups: ArtistReleaseGroupsInterface[]
-  id: string
+  mbid: string
 }
 
 interface ArtistReleaseGroupsInterface {
@@ -36,6 +41,7 @@ query GetArtistDetail($mbid: MBID!) {
       name
       country
       type
+      mbid
       rating {
         value
         voteCount
@@ -58,9 +64,36 @@ interface ParamTypes {
 }
 
 const ArtistView: FC = (props) => {
-  const {mbid} = useParams<ParamTypes>()
+  const {mbid} = useParams<ParamTypes>();
 
   const {data, loading, error} = useQuery<ArtistLookupResponseInterface>(GET_ARTIST_DETAIL, {variables: {mbid: mbid}})
+
+  const store = useContext<StoreInterface>(StoreContext);
+  const {favoriteList} = store;
+
+  const removeFavoriteArtist = () => {
+    const {favoriteList} = store;
+
+    favoriteList?.set(favoriteList.get.filter((favorite: FavoriteArtistInterface) => favorite.mbid !== mbid))
+  }
+
+  const addFavoriteArtist = () => {
+    const newFavoriteArtist = {
+      name: data?.lookup.artist.name,
+      mbid: data?.lookup.artist.mbid
+    } as FavoriteArtistInterface;
+
+    favoriteList && favoriteList.set([
+      ...favoriteList.get,
+      newFavoriteArtist
+    ])
+  }
+
+  const isFavorite = favoriteList?.get.find((artist: FavoriteArtistInterface) => artist.mbid === mbid);
+
+  const addRemoveFavorite = () => {
+    isFavorite ? removeFavoriteArtist() : addFavoriteArtist();
+  }
 
   const loadingMode = (
     <CardContent>
@@ -90,8 +123,12 @@ const ArtistView: FC = (props) => {
             </div>
           </CardContent>
           <CardActions>
-            <IconButton aria-label="add to favorites">
-              <FavoriteIcon />
+            <IconButton
+              color={isFavorite ? 'secondary' : 'default'}
+              aria-label="add to favorites"
+              onClick={() => addRemoveFavorite()}
+            >
+              <FavoriteIcon/>
             </IconButton>
           </CardActions>
         </>
